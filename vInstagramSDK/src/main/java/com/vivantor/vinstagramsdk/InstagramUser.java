@@ -18,7 +18,7 @@ public class InstagramUser
 		return id;
 	}
 
-	public void setId(String id)
+	void setId(String id)
 	{
 		this.id = id;
 	}
@@ -28,7 +28,7 @@ public class InstagramUser
 		return profile_picture;
 	}
 
-	public void setProfile_picture(String profile_picture)
+	void setProfile_picture(String profile_picture)
 	{
 		this.profile_picture = profile_picture;
 	}
@@ -38,7 +38,7 @@ public class InstagramUser
 		return username;
 	}
 
-	public void setUsername(String username)
+	void setUsername(String username)
 	{
 		this.username = username;
 	}
@@ -48,7 +48,7 @@ public class InstagramUser
 		return full_name;
 	}
 
-	public void setFull_name(String full_name)
+	void setFull_name(String full_name)
 	{
 		this.full_name = full_name;
 	}

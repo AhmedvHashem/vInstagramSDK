@@ -33,7 +33,7 @@ import com.vivantor.vinstagramsdk.callbacks.InstagramDialogListener;
  * Created by AhmedNTS on 2016-09-20.
  */
 @SuppressWarnings("all")
-public class InstagramDialog extends Dialog
+class InstagramDialog extends Dialog
 {
 	private static final String TAG = "InstagramDialog";
 	private Context mContext;
@@ -172,7 +172,7 @@ public class InstagramDialog extends Dialog
 		public boolean shouldOverrideUrlLoading(WebView view, String url)
 		{
 			Log.d(TAG, "Redirecting URL " + url);
-			if (url.startsWith(InstagramSDK.mCallbackUrl))
+			if (url.startsWith(InstagramSDK.callbackUrl))
 			{
 				String urls[] = url.split("=");
 				mListener.onComplete(urls[1]);

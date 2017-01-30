@@ -8,8 +8,7 @@ import java.io.InputStreamReader;
 /**
  * Created by AhmedNTS on 2016-09-21.
  */
-
-public class Utils
+class Utils
 {
 	static String streamToString(InputStream is) throws IOException
 	{
@@ -40,5 +39,17 @@ public class Utils
 		}
 
 		return str;
+	}
+
+	static void notNull(Object arg, String name)
+	{
+		if (arg == null)
+			throw new NullPointerException("Argument '" + name + "' cannot be null");
+	}
+
+	static void notNullOrEmpty(String s, String name)
+	{
+		if ((s == null) || (s.length() == 0))
+			throw new IllegalArgumentException("Argument '" + name + "' cannot be null or empty");
 	}
 }

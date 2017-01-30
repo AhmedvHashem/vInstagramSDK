@@ -1,26 +1,10 @@
 package com.vivantor.vinstagramsdk;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import com.vivantor.vinstagramsdk.callbacks.InstagramDialogListener;
 import com.vivantor.vinstagramsdk.callbacks.InstagramSDKListener;
-import com.vivantor.vinstagramsdk.callbacks.InstagramUserListener;
-
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * Created by AhmedNTS on 2016-09-20.
@@ -30,63 +14,55 @@ public class InstagramSDK
 {
 	private static final String TAG = "InstagramSDK";
 
-	private Context mContext;
+	private static final String AUTH_URL = "https://api.instagram.com/oauth/authorize/";
 
-	private InstagramSession mSession;
-	private InstagramDialog instagramDialog;
+	public static Context applicationContext;
+	private static String clientId;
+	public static String callbackUrl;
 
-	private InstagramSDKListener mListener;
-
-	private String mAuthUrl;
-
-	private String mClientId;
-	public static String mCallbackUrl = "";
-
-	static final String AUTH_URL = "https://api.instagram.com/oauth/authorize/";
-	static final String API_URL = "https://api.instagram.com/v1";
-
-	private ProgressDialog mProgress;
-
-	public InstagramSDK(Context context, String clientId, String callbackUrl)
+	public static void initializeSDK(Context applicationContext, String clientId, String callbackUrl)
 	{
-		mContext = context;
+		Utils.notNull(applicationContext, "applicationContext");
 
-		mClientId = clientId;
-		mCallbackUrl = callbackUrl;
+		Utils.notNullOrEmpty(clientId, "clientId");
+		Utils.notNullOrEmpty(callbackUrl, "callbackUrl");
 
-		mAuthUrl = AUTH_URL + "?client_id=" + clientId + "&redirect_uri=" + mCallbackUrl + "&response_type=token&scope=basic&follower_list";
+		InstagramSDK.applicationContext = applicationContext.getApplicationContext();
 
-		mProgress = new ProgressDialog(mContext);
-		mProgress.setCancelable(false);
+		InstagramSDK.clientId = clientId;
+		InstagramSDK.callbackUrl = callbackUrl;
+
+		InstagramAccessToken session = new InstagramAccessToken();
 	}
 
-	public void authorize(InstagramSDKListener listener)
+	public static void login(Context context, final InstagramSDKListener listener)
 	{
-		mListener = listener;
+		String url = AUTH_URL + "?client_id=" + clientId + "&redirect_uri=" + callbackUrl + "&response_type=token&scope=basic&follower_list";
 
-		mSession = new InstagramSession(mContext);
-
-		if (getAccessToken() != null)
+		if (InstagramAccessToken.getAccessToken() != null)
 		{
-			mListener.onSuccess();
+			if (listener != null)
+				listener.onSuccess();
 			return;
 		}
 
-		instagramDialog = new InstagramDialog(mContext, mAuthUrl, new InstagramDialogListener()
+		InstagramDialog instagramDialog = new InstagramDialog(context, url, new InstagramDialogListener()
 		{
 			@Override
 			public void onComplete(String accessToken)
 			{
 				Log.i(TAG, accessToken);
-				mSession.setAccessToken(accessToken);
+				InstagramAccessToken.setAccessToken(accessToken);
 
-				mListener.onSuccess();
+				if (listener != null)
+					listener.onSuccess();
 			}
 
 			@Override
 			public void onError(String error)
 			{
-				mListener.onFail(error);
+				if (listener != null)
+					listener.onFail(error);
 			}
 		});
 
@@ -94,14 +70,8 @@ public class InstagramSDK
 			instagramDialog.show();
 	}
 
-	public String getAccessToken()
+	public static void logout()
 	{
-		return mSession.getAccessToken();
-	}
-
-	public void resetInstagramSession()
-	{
-		if (mSession != null)
-			mSession.resetInstagramSession();
+		InstagramAccessToken.clearAccessToken();
 	}
 }

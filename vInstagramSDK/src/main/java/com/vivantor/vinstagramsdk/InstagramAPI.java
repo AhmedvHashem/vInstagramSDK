@@ -1,6 +1,5 @@
 package com.vivantor.vinstagramsdk;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -20,6 +19,8 @@ import java.net.URL;
 public class InstagramAPI
 {
 	private static final String TAG = "InstagramAPI";
+
+	public static final String API_URL = "https://api.instagram.com/v1";
 
 	private static boolean isAccessTokenExpired(JSONObject meta)
 	{
@@ -41,20 +42,20 @@ public class InstagramAPI
 		return false;
 	}
 
-	public static void getUserByID(final InstagramSDK sdk, final String id, final InstagramUserListener listener)
+	public static void getUserByID(final String id, final InstagramUserListener listener)
 	{
-		final String userInfos = InstagramSDK.API_URL + "/users/" + (id == null ? "self" : id) + "/?access_token=" + sdk.getAccessToken();
+		final String userInfos = API_URL + "/users/" + (id == null ? "self" : id) + "/?access_token=" + InstagramAccessToken.getAccessToken();
 
-		AsyncTask asyncTask = new AsyncTask()
+		AsyncTask<Void, Void, InstagramUser> asyncTask = new AsyncTask<Void, Void, InstagramUser>()
 		{
-			private boolean errorHappened;
 			private String error;
 
-			InstagramUser instagramUser;
 
 			@Override
-			protected Object doInBackground(Object[] params)
+			protected InstagramUser doInBackground(Void... params)
 			{
+				InstagramUser instagramUser = null;
+
 				Log.i(TAG, "Fetching user info");
 				try
 				{
@@ -75,9 +76,8 @@ public class InstagramAPI
 						JSONObject jsonObj = (JSONObject) new JSONTokener(responseMessage).nextValue();
 						if (isAccessTokenExpired(jsonObj.getJSONObject("meta")))
 						{
-							errorHappened = true;
 							error = "AccessTokenExpired";
-							sdk.resetInstagramSession();
+							InstagramAccessToken.clearAccessToken();
 							return null;
 						}
 
@@ -89,13 +89,11 @@ public class InstagramAPI
 					}
 					else
 					{
-						errorHappened = true;
 						error = "Request Error";
 					}
 				}
 				catch (Exception ex)
 				{
-					errorHappened = true;
 					error = "Exception Error";
 					ex.printStackTrace();
 				}
@@ -104,12 +102,12 @@ public class InstagramAPI
 			}
 
 			@Override
-			protected void onPostExecute(Object o)
+			protected void onPostExecute(InstagramUser user)
 			{
-				if (!errorHappened)
+				if (error == null)
 				{
 					if (listener != null)
-						listener.onSuccess((InstagramUser) o);
+						listener.onSuccess(user);
 				}
 				else
 				{
