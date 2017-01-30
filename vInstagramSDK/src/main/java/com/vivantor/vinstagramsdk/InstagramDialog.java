@@ -73,14 +73,15 @@ class InstagramDialog extends Dialog
 //			}
 //		});
 //
-//		setOnDismissListener(new OnDismissListener()
-//		{
-//			@Override
-//			public void onDismiss(DialogInterface dialog)
-//			{
+		setOnDismissListener(new OnDismissListener()
+		{
+			@Override
+			public void onDismiss(DialogInterface dialog)
+			{
 //				((Activity)mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-//			}
-//		});
+				mListener.onError("Canceled");
+			}
+		});
 
 		progressDialog = new ProgressDialog(getContext());
 		progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -116,8 +117,8 @@ class InstagramDialog extends Dialog
 
 		if (width < height)
 		{
-			dimensions[0] = 0.87 * width;
-			dimensions[1] = 0.82 * height;
+			dimensions[0] = 0.88 * width;
+			dimensions[1] = 0.60 * height;
 		}
 		else
 		{
@@ -143,7 +144,7 @@ class InstagramDialog extends Dialog
 		mTitle.setBackgroundColor(0xFF163753);
 		mTitle.setPadding(PADDING * 2, PADDING, PADDING, PADDING);
 		mTitle.setGravity(Gravity.CENTER);
-		mTitle.setCompoundDrawablePadding(PADDING);
+//		mTitle.setCompoundDrawablePadding(PADDING);
 //		mTitle.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
 
 		mContent.addView(mTitle);
@@ -159,11 +160,12 @@ class InstagramDialog extends Dialog
 		mWebView.setLayoutParams(MATCH_PARENT);
 
 		WebSettings webSettings = mWebView.getSettings();
-		webSettings.setJavaScriptEnabled(true);
+//		webSettings.setJavaScriptEnabled(true);
 		webSettings.setSavePassword(false);
 		webSettings.setSaveFormData(false);
 
 		mContent.addView(mWebView);
+		mContent.requestFocus();
 	}
 
 	private class OAuthWebViewClient extends WebViewClient
